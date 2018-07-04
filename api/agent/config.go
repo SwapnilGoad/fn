@@ -8,7 +8,8 @@ import (
 	"time"
 )
 
-type AgentConfig struct {
+// Config may be used to modify an agent's behavior.
+type Config struct {
 	MinDockerVersion        string        `json:"min_docker_version"`
 	DockerNetworks          string        `json:"docker_networks"`
 	DockerLoadFile          string        `json:"docker_load_file"`
@@ -20,7 +21,6 @@ type AgentConfig struct {
 	CallEndTimeout          time.Duration `json:"call_end_timeout"`
 	MaxCallEndStacking      uint64        `json:"max_call_end_stacking"`
 	MaxResponseSize         uint64        `json:"max_response_size_bytes"`
-	MaxRequestSize          uint64        `json:"max_request_size_bytes"`
 	MaxLogSize              uint64        `json:"max_log_size_bytes"`
 	MaxTotalCPU             uint64        `json:"max_total_cpu_mcpus"`
 	MaxTotalMemory          uint64        `json:"max_total_memory_bytes"`
@@ -46,7 +46,6 @@ const (
 	EnvCallEndTimeout          = "FN_CALL_END_TIMEOUT_MSECS"
 	EnvMaxCallEndStacking      = "FN_MAX_CALL_END_STACKING"
 	EnvMaxResponseSize         = "FN_MAX_RESPONSE_SIZE"
-	EnvMaxRequestSize          = "FN_MAX_REQUEST_SIZE"
 	EnvMaxLogSize              = "FN_MAX_LOG_SIZE_BYTES"
 	EnvMaxTotalCPU             = "FN_MAX_TOTAL_CPU_MCPUS"
 	EnvMaxTotalMemory          = "FN_MAX_TOTAL_MEMORY_BYTES"
@@ -67,9 +66,9 @@ const (
 	DefaultHotPoll = 200 * time.Millisecond
 )
 
-func NewAgentConfig() (*AgentConfig, error) {
-
-	cfg := &AgentConfig{
+// NewConfig creates a default config and then checks the environment for configuration.
+func NewConfig() (*Config, error) {
+	cfg := &Config{
 		MinDockerVersion:   "17.10.0-ce",
 		MaxLogSize:         1 * 1024 * 1024,
 		MaxCallEndStacking: 8192,
@@ -86,7 +85,6 @@ func NewAgentConfig() (*AgentConfig, error) {
 	err = setEnvMsecs(err, EnvAsyncChewPoll, &cfg.AsyncChewPoll, time.Duration(60)*time.Second)
 	err = setEnvMsecs(err, EnvCallEndTimeout, &cfg.CallEndTimeout, time.Duration(10)*time.Minute)
 	err = setEnvUint(err, EnvMaxResponseSize, &cfg.MaxResponseSize)
-	err = setEnvUint(err, EnvMaxRequestSize, &cfg.MaxRequestSize)
 	err = setEnvUint(err, EnvMaxLogSize, &cfg.MaxLogSize)
 	err = setEnvUint(err, EnvMaxTotalCPU, &cfg.MaxTotalCPU)
 	err = setEnvUint(err, EnvMaxTotalMemory, &cfg.MaxTotalMemory)
